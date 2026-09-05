@@ -5,7 +5,7 @@ use futures_core::{
 };
 use std::{future::Future, pin::Pin};
 
-impl<'s, Y, F: Future<Output = ()>> Stream for Gen<'s, Y, (), F> {
+impl<Y, F: Future<Output = ()>> Stream for Gen<'_, Y, (), F> {
     type Item = Y;
 
     fn poll_next(

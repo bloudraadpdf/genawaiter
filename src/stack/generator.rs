@@ -34,7 +34,6 @@ impl<Y, R, F: Future> Shelf<Y, R, F> {
 }
 
 impl<Y, R, F: Future> Default for Shelf<Y, R, F> {
-    #[must_use]
     fn default() -> Self {
         Self::new()
     }
@@ -125,7 +124,7 @@ impl<'s, Y, R, F: Future> Gen<'s, Y, R, F> {
     }
 }
 
-impl<'s, Y, R, F: Future> Drop for Gen<'s, Y, R, F> {
+impl<Y, R, F: Future> Drop for Gen<'_, Y, R, F> {
     fn drop(&mut self) {
         // Safety: `future` itself is a `MaybeUninit`, which is guaranteed to be
         // initialized, because the only way to construct a `Gen` is with
@@ -140,7 +139,7 @@ impl<'s, Y, R, F: Future> Drop for Gen<'s, Y, R, F> {
     }
 }
 
-impl<'s, Y, F: Future> Gen<'s, Y, (), F> {
+impl<Y, F: Future> Gen<'_, Y, (), F> {
     /// Resumes execution of the generator.
     ///
     /// If the generator yields a value, `Yielded` is returned. Otherwise,
@@ -166,7 +165,7 @@ impl<'s, Y, F: Future> Gen<'s, Y, (), F> {
     }
 }
 
-impl<'s, Y, R, F: Future> Coroutine for Gen<'s, Y, R, F> {
+impl<Y, R, F: Future> Coroutine for Gen<'_, Y, R, F> {
     type Yield = Y;
     type Resume = R;
     type Return = F::Output;

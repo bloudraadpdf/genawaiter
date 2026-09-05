@@ -64,7 +64,7 @@ fn main() {
         list.push(13);
 
         for x in list.iter() {
-            println!("{:?}", x);
+            println!("{x:?}");
         }
     }
 

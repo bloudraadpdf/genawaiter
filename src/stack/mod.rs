@@ -415,8 +415,8 @@ mod tests {
     #[should_panic(expected = "Co::yield_")]
     fn multiple_yield_helpful_message() {
         async fn wrong(mut co: Co<'_, i32>) {
-            let _ = co.yield_(10);
-            let _ = co.yield_(20);
+            drop(co.yield_(10));
+            drop(co.yield_(20));
         }
 
         let_gen_using!(gen, wrong);
@@ -435,7 +435,7 @@ mod tests {
             GeneratorState::Yielded(_) => panic!(),
             GeneratorState::Complete(co) => co,
         };
-        let _ = escaped_co.yield_(10);
+        drop(escaped_co.yield_(10));
     }
 
     /// Test the unsafe `Gen::drop` implementation.
@@ -461,16 +461,11 @@ mod tests {
                 }
             });
             assert_eq!(gen.resume(), GeneratorState::Yielded(10));
-            // `gen` is only a reference to the generator, and dropping a reference has
-            // no effect. The underlying generator is hidden behind macro hygiene and so
-            // cannot be dropped early.
-            #[allow(clippy::drop_ref)]
-            drop(gen);
-            assert_eq!(flag.load(Ordering::SeqCst), false);
+            assert!(!flag.load(Ordering::SeqCst));
         }
         // After the block above ends, the generator goes out of scope and is dropped,
         // which drops the incomplete future, which drops `_set_on_drop`, which sets the
         // flag.
-        assert_eq!(flag.load(Ordering::SeqCst), true);
+        assert!(flag.load(Ordering::SeqCst));
     }
 }

@@ -71,7 +71,7 @@ struct Advance<'a, F: Future, A: Airlock> {
     airlock: A,
 }
 
-impl<'a, F: Future, A: Airlock> Advance<'a, F, A> {
+impl<F: Future, A: Airlock> Advance<'_, F, A> {
     fn future_mut(self: Pin<&mut Self>) -> Pin<&mut F> {
         // Safety: This is just projecting a pinned reference. Neither `self` nor
         // `self.future` are moved.
@@ -79,7 +79,7 @@ impl<'a, F: Future, A: Airlock> Advance<'a, F, A> {
     }
 }
 
-impl<'a, F: Future, A: Airlock> Future for Advance<'a, F, A> {
+impl<F: Future, A: Airlock> Future for Advance<'_, F, A> {
     type Output = GeneratorState<A::Yield, F::Output>;
 
     fn poll(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<Self::Output> {
@@ -157,13 +157,13 @@ struct Barrier<'a, A: Airlock> {
     airlock: &'a A,
 }
 
-impl<'a, A: Airlock> Future for Barrier<'a, A> {
+impl<A: Airlock> Future for Barrier<'_, A> {
     type Output = A::Resume;
 
     fn poll(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<Self::Output> {
         match self.airlock.peek() {
-            Next::Yield(_) => Poll::Pending,
-            Next::Resume(_) => {
+            Next::Yield(()) => Poll::Pending,
+            Next::Resume(()) => {
                 let next = self.airlock.replace(Next::Empty);
                 match next {
                     Next::Resume(arg) => Poll::Ready(arg),

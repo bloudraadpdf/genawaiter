@@ -65,6 +65,17 @@ let odd_numbers_less_than_ten = Gen::new(|co| async move {
 
 ## Development
 
+### Organisation fork
+
+The `bloudraadpdf` fork uses `proc-macro-error` 1.0.4.
+Use a full Git revision when you select this fork.
+Run `mise install`, then `just check`, before you publish a change.
+
+The fork requires Rust 1.96. The checks use Rust 1.96.1.
+The stable format rules are in `rustfmt.toml`.
+The fork removes compatibility code that has no callers.
+It also removes incorrect method attributes.
+
 ### Install prerequisites
 
 - [Rust]

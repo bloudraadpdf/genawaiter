@@ -9,6 +9,7 @@
 #![warn(clippy::pedantic)]
 #![cfg_attr(feature = "strict", deny(warnings))]
 
+#[cfg(feature = "proc_macro")]
 use std::error::Error;
 
 #[cfg(not(feature = "proc_macro"))]
@@ -32,7 +33,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         for result in counter {
             // Check each item for errors, and bail early if we hit one
             let result = result?;
-            println!("{}", result);
+            println!("{result}");
         }
         Ok(())
     }
@@ -44,7 +45,7 @@ fn main() -> Result<(), Box<dyn Error>> {
         }
 
         // If there's no error, do some work and return a value
-        Ok(format!(":{}:", num))
+        Ok(format!(":{num}:"))
     }
 
     main()

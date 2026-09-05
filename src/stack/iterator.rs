@@ -5,7 +5,6 @@ impl<'s, Y, F: Future<Output = ()>> IntoIterator for Gen<'s, Y, (), F> {
     type Item = Y;
     type IntoIter = IntoIter<'s, Y, F>;
 
-    #[must_use]
     fn into_iter(self) -> Self::IntoIter {
         IntoIter { generator: self }
     }
@@ -15,7 +14,7 @@ pub struct IntoIter<'s, Y, F: Future<Output = ()>> {
     generator: Gen<'s, Y, (), F>,
 }
 
-impl<'s, Y, F: Future<Output = ()>> Iterator for IntoIter<'s, Y, F> {
+impl<Y, F: Future<Output = ()>> Iterator for IntoIter<'_, Y, F> {
     type Item = Y;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -31,6 +30,13 @@ impl<'r, 's, Y, F: Future<Output = ()>> IntoIterator for &'r mut Gen<'s, Y, (), 
     type IntoIter = MutIntoIter<'r, 's, Y, F>;
 
     fn into_iter(self) -> Self::IntoIter {
+        self.iter_mut()
+    }
+}
+
+impl<'s, Y, F: Future<Output = ()>> Gen<'s, Y, (), F> {
+    /// Borrow this generator as an iterator.
+    pub fn iter_mut(&mut self) -> MutIntoIter<'_, 's, Y, F> {
         MutIntoIter { generator: self }
     }
 }
@@ -39,7 +45,7 @@ pub struct MutIntoIter<'r, 's, Y, F: Future<Output = ()>> {
     generator: &'r mut Gen<'s, Y, (), F>,
 }
 
-impl<'r, 's, Y, F: Future<Output = ()>> Iterator for MutIntoIter<'r, 's, Y, F> {
+impl<Y, F: Future<Output = ()>> Iterator for MutIntoIter<'_, '_, Y, F> {
     type Item = Y;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -73,7 +79,7 @@ mod tests {
         let_gen_using!(gen, produce);
 
         let mut sum = 0;
-        for x in gen {
+        for x in gen.iter_mut() {
             sum += x;
         }
         assert_eq!(sum, 30);

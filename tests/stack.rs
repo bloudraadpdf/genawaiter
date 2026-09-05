@@ -49,7 +49,7 @@ fn stack_proc_macro_fn() {
     }
     let_gen_using!(gen, odds);
     let res = gen.into_iter().collect::<Vec<_>>();
-    assert_eq!(vec![1, 3, 5, 7, 9], res)
+    assert_eq!(vec![1, 3, 5, 7, 9], res);
 }
 
 #[cfg(feature = "proc_macro")]
@@ -64,13 +64,13 @@ fn stack_yield_a_func_call() {
     async fn odds() {
         for n in (1..).step_by(2).take_while(|&n| n < 10) {
             if true {
-                yield_!(pass_thru(n))
+                yield_!(pass_thru(n));
             }
         }
     }
     let_gen_using!(gen, odds);
     let res = gen.into_iter().collect::<Vec<_>>();
-    assert_eq!(vec![1, 3, 5, 7, 9], res)
+    assert_eq!(vec![1, 3, 5, 7, 9], res);
 }
 
 #[cfg(feature = "proc_macro")]
@@ -87,7 +87,7 @@ fn stack_yield_loop_break() {
             }
             loop {
                 n += 1;
-                if n % 2 != 0 {
+                if !n.is_multiple_of(2) {
                     break yield_!(n);
                 }
             }
@@ -95,7 +95,7 @@ fn stack_yield_loop_break() {
     }
     let_gen_using!(gen, odds);
     let res = gen.into_iter().collect::<Vec<_>>();
-    assert_eq!(vec![1, 3, 5, 7, 9], res)
+    assert_eq!(vec![1, 3, 5, 7, 9], res);
 }
 
 #[cfg(feature = "proc_macro")]
@@ -114,26 +114,24 @@ fn stack_yield_match() {
     }
     let_gen_using!(gen, odds);
     let res = gen.into_iter().collect::<Vec<_>>();
-    assert_eq!(vec![1, 3, 5, 7, 9], res)
+    assert_eq!(vec![1, 3, 5, 7, 9], res);
 }
 
 #[test]
 fn stack_yield_closure_no_macro() {
     let mut shelf = genawaiter::stack::Shelf::new();
     let gen = unsafe {
-        Gen::new(&mut shelf, |mut co| {
-            async move {
-                let mut n = 1;
-                while n < 10 {
-                    co.yield_(n).await;
-                    n += 2;
-                }
+        Gen::new(&mut shelf, |mut co| async move {
+            let mut n = 1;
+            while n < 10 {
+                co.yield_(n).await;
+                n += 2;
             }
         })
     };
 
     let res = gen.into_iter().collect::<Vec<_>>();
-    assert_eq!(vec![1, 3, 5, 7, 9], res)
+    assert_eq!(vec![1, 3, 5, 7, 9], res);
 }
 
 #[cfg(feature = "proc_macro")]
@@ -155,7 +153,7 @@ fn stack_yield_closure() {
         )
     };
     let res = gen.into_iter().collect::<Vec<_>>();
-    assert_eq!(vec![1, 3, 5, 7, 9], res)
+    assert_eq!(vec![1, 3, 5, 7, 9], res);
 }
 
 #[cfg(feature = "proc_macro")]
@@ -171,7 +169,7 @@ fn stack_convenience_macro() {
         }
     });
     let res = generator.into_iter().collect::<Vec<_>>();
-    assert_eq!(vec![1, 3, 5, 7, 9], res)
+    assert_eq!(vec![1, 3, 5, 7, 9], res);
 }
 
 #[cfg(feature = "proc_macro")]

@@ -5,6 +5,7 @@ name = "genawaiter"
 version = "0.99.1"
 authors = ["John Simon <john@whatisaph.one>"]
 edition = "2018"
+rust-version = "1.96"
 license = "MIT"
 description = "Stackless generators on stable Rust."
 repository = "https://github.com/whatisaphone/genawaiter"
