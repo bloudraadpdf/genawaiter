@@ -67,7 +67,7 @@ let odd_numbers_less_than_ten = Gen::new(|co| async move {
 
 ### Organisation fork
 
-The `bloudraadpdf` fork uses `proc-macro-error` 1.0.4.
+The organisation fork uses `proc-macro-error` 1.0.4.
 Use a full Git revision when you select this fork.
 Run `mise install`, then `just check`, before you publish a change.
 
